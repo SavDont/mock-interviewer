@@ -1,0 +1,27 @@
+{
+  "name": "weak",
+  "description": "No requirements or numbers, buzzwords, and can't answer basic follow-ups.",
+  "expect": { "verdicts": ["No", "Strong No", "Not enough evidence"] },
+  "log": [
+    "[00:05] Interviewer: \"Hi, I'm Sam. Today let's design a URL shortener, like bit.ly, that handles 100 million new links a day. Where would you like to start?\"",
+    "[00:20] Candidate: \"Okay so I'd use microservices, with Kafka and Kubernetes so it scales.\"",
+    "[00:50] Interviewer: \"Before the technology, what does the system need to do?\"",
+    "[01:00] Candidate: \"Shorten URLs. And be scalable.\"",
+    "[01:30] Interviewer: \"How many requests a second are we talking about?\"",
+    "[01:40] Candidate: \"A lot. Millions, probably.\"",
+    "[02:30] Whiteboard: added box \"Kafka\"; added box \"Kubernetes\"; added box \"NoSQL\"",
+    "[03:00] Interviewer: \"Walk me through what happens when someone creates a link.\"",
+    "[03:10] Candidate: \"It goes to Kafka, and then a service picks it up and saves it in NoSQL.\"",
+    "[03:40] Interviewer: \"And how is the short code made?\"",
+    "[03:50] Candidate: \"Um, I'm not sure. Maybe random?\"",
+    "[04:30] Interviewer: \"What about when someone visits a short link?\"",
+    "[04:40] Candidate: \"It also goes through Kafka, then the service finds it.\"",
+    "[05:10] Interviewer: \"Wouldn't a queue add latency to a redirect?\"",
+    "[05:20] Candidate: \"Kafka is really fast, so it's fine.\"",
+    "[07:00] Interviewer: \"What happens if two random codes are the same?\"",
+    "[07:10] Candidate: \"That probably won't happen.\"",
+    "[09:00] Candidate: \"I think that's my design.\""
+  ],
+  "notes": ["No requirements, no estimates", "Read path through a queue", "Buzzwords without reasons", "Couldn't explain code generation"],
+  "scene": "box \"Kafka\"\nbox \"Kubernetes\"\nbox \"NoSQL\""
+}

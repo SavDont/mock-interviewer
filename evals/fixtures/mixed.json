@@ -1,0 +1,35 @@
+{
+  "name": "mixed",
+  "description": "Workable design, but estimates are never used, and deep dives only happen when pushed.",
+  "expect": { "verdicts": ["Lean No", "No", "Lean Yes"] },
+  "log": [
+    "[00:05] Interviewer: \"Hi, I'm Sam. Today let's design a URL shortener, like bit.ly, that handles 100 million new links a day. Where would you like to start?\"",
+    "[00:20] Candidate: \"So users give a long URL and get a short one, and visiting the short one redirects. It should be fast and scalable.\"",
+    "[01:00] Interviewer: \"What does fast mean here, and what else matters?\"",
+    "[01:10] Candidate: \"Low latency on redirects, maybe under 100 milliseconds. And it should be highly available.\"",
+    "[02:00] Candidate: \"100 million a day is around a thousand writes a second. Reads are probably more. Storage is a lot over time.\"",
+    "[03:00] Whiteboard: added box \"Client\"; added box \"Server\"; added box \"DB\"; added \"Server\" → \"DB\"",
+    "[03:30] Candidate: \"The server takes the URL, hashes it with MD5, takes the first 7 characters, and stores it in the database. On a visit it looks up the code and redirects.\"",
+    "[04:30] Interviewer: \"What happens when two URLs hash to the same 7 characters?\"",
+    "[04:40] Candidate: \"Hmm, then we'd have a collision. I guess we check if it exists and if so add a salt and hash again.\"",
+    "[06:00] Interviewer: \"Which database?\"",
+    "[06:05] Candidate: \"Postgres, it's reliable.\"",
+    "[06:30] Interviewer: \"At your read rate, is one Postgres enough?\"",
+    "[06:40] Candidate: \"Probably not, so we add a cache, like Redis, in front of it. And read replicas.\"",
+    "[07:00] Whiteboard: added box \"Redis\"; added \"Server\" → \"Redis\"",
+    "[09:00] Candidate: \"We can also shard the database when it gets big.\"",
+    "[09:10] Interviewer: \"Shard on what key?\"",
+    "[09:20] Candidate: \"On the short code, so lookups go to one shard.\"",
+    "[12:00] Interviewer: \"What happens if Redis goes down?\"",
+    "[12:10] Candidate: \"Then requests go to the database, which might be slow, but it still works. I think that covers it.\"",
+    "[13:00] Interviewer: \"We have time. Anything else you'd want to address?\"",
+    "[13:10] Candidate: \"Maybe analytics? We could log clicks to a queue. Otherwise I think that's the design.\""
+  ],
+  "notes": [
+    "Requirements thin, needed prompting",
+    "Estimates never used",
+    "Collision handling only after prompt",
+    "Sharding key fine when asked"
+  ],
+  "scene": "box \"Client\"\nbox \"Server\"\nbox \"DB\"\nbox \"Redis\"\n\"Server\" → \"DB\"\n\"Server\" → \"Redis\""
+}

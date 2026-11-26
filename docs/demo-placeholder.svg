@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="400" viewBox="0 0 960 400">
+  <rect width="960" height="400" rx="16" fill="#f4f4f6"/>
+  <rect x="24" y="24" width="600" height="352" rx="10" fill="#ffffff" stroke="#d8d8de"/>
+  <rect x="80" y="90" width="150" height="60" rx="6" fill="none" stroke="#6b6bd6" stroke-width="2"/>
+  <rect x="320" y="90" width="150" height="60" rx="6" fill="none" stroke="#6b6bd6" stroke-width="2"/>
+  <rect x="320" y="240" width="150" height="60" rx="6" fill="none" stroke="#6b6bd6" stroke-width="2"/>
+  <path d="M230 120 H320 M395 150 V240" stroke="#6b6bd6" stroke-width="2"/>
+  <rect x="648" y="24" width="288" height="352" rx="10" fill="#ffffff" stroke="#d8d8de"/>
+  <rect x="668" y="60" width="220" height="14" rx="7" fill="#e3e3f7"/>
+  <rect x="668" y="90" width="180" height="14" rx="7" fill="#ececf0"/>
+  <rect x="668" y="120" width="240" height="14" rx="7" fill="#e3e3f7"/>
+  <rect x="668" y="150" width="150" height="14" rx="7" fill="#ececf0"/>
+  <text x="480" y="372" font-family="system-ui, sans-serif" font-size="18" fill="#77777f" text-anchor="middle">Demo GIF coming soon</text>
+</svg>

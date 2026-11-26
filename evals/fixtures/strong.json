@@ -1,0 +1,26 @@
+{
+  "name": "strong",
+  "description": "Drives the whole interview, numbers drive decisions, solid deep dives on ID generation and caching.",
+  "expect": { "verdicts": ["Yes", "Strong Yes", "Lean Yes"] },
+  "log": [
+    "[00:05] Interviewer: \"Hi, I'm Sam. Today let's design a URL shortener, like bit.ly, that handles 100 million new links a day. Where would you like to start?\"",
+    "[00:20] Candidate: \"I'll start with requirements. Functionally: create a short link for a long URL, redirect on visit, optional custom aliases and expiry. Analytics I'll treat as out of scope except a click counter. Non-functional: redirects are the hot path, so I want p99 under 50 milliseconds, very high availability for reads, and links must never point to the wrong URL, so creation needs to be strongly unique.\"",
+    "[01:40] Candidate: \"Numbers. 100 million writes a day is about 1,200 per second, peak maybe 3x, so 4,000. Reads: assume 100 to 1, so 120,000 a second average, 400,000 at peak. Storage: 500 bytes a row, 100 million a day is 50 gigabytes a day, about 18 terabytes a year, call it 100 terabytes over five years with replication. That tells me reads dominate, so caching matters most, and storage is big enough that I want a store that shards easily.\"",
+    "[03:30] Candidate: \"Short codes: base62 with 7 characters gives 3.5 trillion codes, which covers 100 million a day for about 95 years. Is that okay as an assumption?\"",
+    "[03:40] Interviewer: \"Sounds good. How do you generate them?\"",
+    "[03:45] Candidate: \"Options are hashing the URL, a random code with a collision check, or a counter. Hashing gives collisions and leaks duplicate URLs. Random needs a read before every write. I'd use ranges from a counter: a small coordination service hands each app server a block of a million IDs, the server encodes them in base62. No collision checks, no hot counter. The cost is codes are guessable and sequential, so I'd shuffle them with a reversible permutation if guessability matters.\"",
+    "[05:30] Whiteboard: added box \"Client\"; added box \"LB\"; added box \"API servers\"; added box \"ID range service\"; added box \"Redis cache\"; added box \"Cassandra\"; added \"API servers\" → \"Redis cache\" labeled \"read-through\"; added \"API servers\" → \"Cassandra\"",
+    "[06:00] Candidate: \"API: POST /links with the long URL, optional alias and TTL, returns the code. GET /{code} returns a 301 or 302. I'd use 302 so we still see clicks for the counter. Data model is one table keyed by code: long URL, created at, expiry, owner.\"",
+    "[07:20] Interviewer: \"Why Cassandra and not Postgres?\"",
+    "[07:30] Candidate: \"It's a pure key-value lookup by code, 100 terabytes, and 4,000 writes a second at peak. Postgres can do it with sharding, but I'd be building the sharding myself. Cassandra partitions by code natively and handles the write rate. I give up joins and transactions, which I don't need. Custom aliases need uniqueness, so for those I'd use a lightweight transaction, insert if not exists, which is slower but rare.\"",
+    "[09:30] Candidate: \"Deep dive on the read path. 400,000 reads a second at peak. Link popularity is heavily skewed, so a cache of the top 20 percent of links gets most hits. 20 percent of a day's links is 10 gigabytes, easily fits in a Redis cluster. With a 90 percent hit rate, Cassandra sees 40,000 reads a second, which is fine for a modest cluster.\"",
+    "[11:00] Interviewer: \"What happens when a celebrity tweets a link and it gets a million hits a second?\"",
+    "[11:10] Candidate: \"One Redis key becomes a hot shard. I'd add a small in-process LRU cache on each API server with a few seconds of TTL, so the hot key is served from memory and Redis only sees one request per server per few seconds. The CDN can also cache 302s for public links for a short time.\"",
+    "[13:00] Candidate: \"Failure modes: if the ID range service is down, servers keep using their current block, and blocks are big enough for minutes. If Redis fails, we fall back to Cassandra and shed load with a circuit breaker. Cassandra with replication factor 3 and quorum reads survives a node loss. Expired links get filtered on read and cleaned up by a background job.\"",
+    "[15:00] Candidate: \"I've covered the main parts. Do you want me to go deeper on anything, or talk about abuse, like malicious URLs?\"",
+    "[15:10] Interviewer: \"Briefly, abuse.\"",
+    "[15:15] Candidate: \"Check new URLs against a safe-browsing list asynchronously, rate-limit creation per API key and IP, and keep a kill switch to disable a code. I'd revisit the counter approach if we ever needed multi-region writes, since range allocation would need to be per region.\""
+  ],
+  "notes": ["Drove requirements and numbers unprompted", "Defended Cassandra with reasons", "Handled hot key well"],
+  "scene": "box \"Client\" (top-left)\nbox \"LB\"\nbox \"API servers\"\nbox \"ID range service\"\nbox \"Redis cache\"\nbox \"Cassandra\"\n\"API servers\" → \"Redis cache\" labeled \"read-through\"\n\"API servers\" → \"Cassandra\""
+}

@@ -1,0 +1,25 @@
+# Dependencies and build output
+node_modules/
+dist/
+
+# Secrets: never commit real keys. .env.example is the template.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Your interviews: transcripts, resumes, debriefs and whiteboards stay on your machine.
+.sessions/
+*.board.png
+
+# Downloaded speech models (hundreds of MB)
+models/
+
+# Eval output (contains model responses)
+evals/results/
+
+# Local tooling
+.claude/
+.DS_Store
+*.log

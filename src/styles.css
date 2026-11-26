@@ -1,0 +1,722 @@
+:root {
+  --bg: #ffffff;
+  --panel: #f7f7f8;
+  --border: #e3e3e8;
+  --text: #1b1b1f;
+  --muted: #6b6b76;
+  --accent: #6965db; /* Excalidraw purple */
+  --accent-soft: #ecebff;
+  --danger: #d9364f;
+  --board: #8a8a95;
+  --good: #1f9d55;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--text);
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  height: 100vh;
+}
+.canvas {
+  position: relative;
+  min-width: 0;
+}
+.panel {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border);
+  background: var(--panel);
+  min-height: 0;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.title {
+  font-weight: 650;
+  font-size: 15px;
+}
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.status-listening .dot,
+.status-thinking .dot {
+  background: var(--good);
+}
+.status-speaking .dot {
+  background: var(--accent);
+  animation: pulse 0.9s infinite alternate;
+}
+.status-speaking {
+  color: var(--accent);
+}
+@keyframes pulse {
+  from {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+.clock {
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--muted);
+}
+.clock.over {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.controls button {
+  flex: 1;
+}
+
+button {
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+}
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+button.danger {
+  color: var(--danger);
+}
+
+.error {
+  margin: 10px 16px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fdecef;
+  color: #8f1d30;
+  font-size: 13px;
+}
+.modal .error {
+  margin: 0 0 12px;
+}
+
+.transcript {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+.line {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  column-gap: 6px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.line .at {
+  grid-row: span 2;
+  font-size: 11px;
+  color: var(--muted);
+  padding-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.line .who {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.line.interviewer .who {
+  color: var(--accent);
+}
+.line.interviewer .text {
+  background: var(--accent-soft);
+  padding: 6px 9px;
+  border-radius: 8px;
+}
+.line.board .text {
+  color: var(--board);
+  font-size: 12px;
+}
+.line.interim .text {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.type-row {
+  display: flex;
+  gap: 6px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+}
+.type-row input {
+  flex: 1;
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.footer {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 0 16px 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.footer label {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  cursor: pointer;
+}
+.cost {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+.notes {
+  max-height: 180px;
+  overflow-y: auto;
+  margin: 0 16px 12px;
+  padding: 8px 10px;
+  background: #fff;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 30, 0.35);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  padding: 16px;
+}
+.modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px 24px;
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+.modal.wide {
+  width: min(820px, 100%);
+}
+.modal h2 {
+  margin: 0 0 6px;
+  font-size: 19px;
+}
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.field textarea,
+.field input,
+.field select {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text);
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  resize: vertical;
+}
+.row {
+  display: flex;
+  gap: 12px;
+}
+.row.end {
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+.grow {
+  flex: 1;
+}
+.check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 13px;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.check input {
+  margin-top: 3px;
+}
+.modal button.primary {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  font-size: 14px;
+}
+.row.end button.primary {
+  width: auto;
+  margin-top: 0;
+}
+
+.feedback {
+  font-size: 14px;
+  line-height: 1.55;
+}
+.feedback h2,
+.feedback h3 {
+  font-size: 15px;
+  margin: 18px 0 6px;
+}
+.feedback table {
+  border-collapse: collapse;
+  margin: 8px 0;
+}
+.feedback th,
+.feedback td {
+  border: 1px solid var(--border);
+  padding: 5px 10px;
+  text-align: left;
+}
+.feedback code {
+  background: var(--panel);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 40vh;
+  }
+  .panel {
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+}
+
+/* Noise gate slider + mic level meter */
+.gate {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  align-items: center;
+  padding: 8px 14px 0;
+  font-size: 12px;
+  color: var(--muted, #666);
+}
+.gate input[type="range"] {
+  width: 100%;
+  accent-color: #6965db;
+}
+.meter {
+  grid-column: 1 / -1;
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(127, 127, 127, 0.2);
+  overflow: hidden;
+}
+.meter-fill {
+  height: 100%;
+  width: 0;
+  background: #9aa0a6;
+  transition: width 60ms linear;
+}
+.meter-fill.hot {
+  background: #2f9e44;
+}
+.meter-mark {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  margin-left: -1px;
+  background: #e03131;
+}
+.field input[type="range"] {
+  accent-color: #6965db;
+}
+
+/* Mic calibration */
+.cal-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.cal-row input[type="range"] {
+  flex: 1;
+}
+.cal-box {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(105, 101, 219, 0.08);
+  font-size: 13px;
+}
+.cal-sentence {
+  font-size: 15px;
+  line-height: 1.4;
+}
+.small {
+  font-size: 12px;
+}
+.warn {
+  color: #c92a2a;
+}
+
+/* Opening choice: which interview to practice */
+.mode-pick {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+.mode-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  padding: 16px;
+  border-radius: 12px;
+  line-height: 1.4;
+}
+.mode-card b {
+  font-size: 15px;
+}
+.mode-card:hover {
+  background: var(--accent-soft);
+}
+button.link {
+  border: 0;
+  background: none;
+  color: var(--accent);
+  padding: 0;
+}
+@media (max-width: 560px) {
+  .mode-pick {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Recruiter screen: a voice call, so the transcript takes the whole window */
+.app.call {
+  grid-template-columns: 1fr;
+}
+.app.call .panel {
+  border-left: 0;
+  width: min(760px, 100%);
+  justify-self: center;
+  border-inline: 1px solid var(--border);
+}
+
+/* Recruiter setup form */
+.seg {
+  display: flex;
+  gap: 6px;
+}
+.seg button {
+  flex: 1;
+  font-weight: 400;
+}
+.seg button.on {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.file-btn {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text);
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+.file-btn:hover {
+  border-color: var(--accent);
+}
+.file-btn input {
+  display: none;
+}
+.field .small,
+.field .muted {
+  font-weight: 400;
+}
+
+/* Past calls */
+.call-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+.call-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 10px;
+}
+.call-row:hover {
+  background: var(--accent-soft);
+}
+.call-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.verdict {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.verdict.good {
+  color: var(--good);
+  border-color: currentColor;
+}
+.verdict.bad {
+  color: var(--danger);
+  border-color: currentColor;
+}
+.modal.past {
+  width: min(1200px, 100%);
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal.past .modal-head {
+  align-items: flex-start;
+  gap: 12px;
+}
+.past-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 12px;
+}
+.past-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.past-col-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  font-size: 13px;
+}
+.past-col-head label {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  color: var(--muted);
+  cursor: pointer;
+}
+.past-col .feedback {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 16px 16px;
+}
+.past-col .notes {
+  flex: 1;
+  max-height: none;
+  margin: 12px;
+}
+.modal.past .row.end {
+  align-items: center;
+}
+button.danger-link {
+  color: var(--danger);
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+.tabs button {
+  border: 0;
+  background: none;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.tabs button.on {
+  background: #fff;
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--border);
+}
+.past-col-head {
+  justify-content: space-between;
+}
+.board-view {
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+  background: #fff;
+}
+.board-view img {
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Drills */
+.drill-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.drill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.drill-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid var(--border);
+  line-height: 1.4;
+}
+.drill-card-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.modal .drill-card button.primary {
+  width: auto;
+  margin: 0;
+  padding: 7px 14px;
+}
+.drill-banner {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  margin-bottom: 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* API key setup */
+.key-panel {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.weak-spots {
+  margin: 4px 0 10px;
+}
